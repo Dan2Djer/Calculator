@@ -1,87 +1,82 @@
-let num1, num2, result, operation
+let num1, num2, result, operation;
 
-const one = document.getElementById('1')
-const two = document.getElementById('2')
-const three = document.getElementById('3')
-const four = document.getElementById('4')
-const five = document.getElementById('5')
-const six = document.getElementById('6')
-const seven = document.getElementById('7')
-const eight = document.getElementById('8')
-const nine = document.getElementById('9')
-
-const plus = document.getElementById('+')
-const minus = document.getElementById('-')
-const multiply = document.getElementById('*')
-const split = document.getElementById('/')
-const equal = document.getElementById('equals')
-
-const numberButtons = document.querySelectorAll('.number')
-const operator = document.querySelectorAll('.operator')
+const numberButtons = document.querySelectorAll('.number');
+const operators = document.querySelectorAll('.operator');
+const equal = document.getElementById('equals');
+const clearButton = document.getElementById('clear');
+const dotButton = document.getElementById('dot');
 
 // Функция для добавления значения на дисплей
 function appendToDisplay(value) {
-    const display = document.getElementById('display')
-    display.textContent = display.textContent === '0' ? value : display.textContent + value
+    const display = document.getElementById('display');
+    if (display.textContent === '0' && value !== '.') {
+        display.textContent = value;
+    } else {
+        display.textContent += value;
+    }
 }
 
 // Функция для операций
-function oper(num1, num2, operation){
-    if(operation == '+'){
-        return num1 + num2
-    }
-    if(operation == '-'){
-        return num1 - num2
-    }
-    if(operation == '*'){
-        return num1 * num2
-    }
-    if(operation == '/'){
-        return num1 / num2
+function calculate(num1, num2, operation) {
+    num1 = parseFloat(num1);
+    num2 = parseFloat(num2);
+    
+    switch(operation) {
+        case '+':
+            return num1 + num2;
+        case '-':
+            return num1 - num2;
+        case '*':
+            return num1 * num2;
+        case '/':
+            if (num2 === 0) {
+                return 'Error';
+            }
+            return num1 / num2;
+        default:
+            return num2;
     }
 }
 
 // Обработчик для цифровых кнопок
 numberButtons.forEach(button => {
     button.addEventListener('click', function() {
-        const value = this.dataset.value || this.textContent
-        appendToDisplay(value)
-    })
-})
+        const value = this.dataset.value || this.textContent;
+        appendToDisplay(value);
+    });
+});
+
+// Обработчик для точки
+dotButton.addEventListener('click', function() {
+    const display = document.getElementById('display');
+    if (!display.textContent.includes('.')) {
+        appendToDisplay('.');
+    }
+});
 
 // Обработчик для кнопки С
-document.getElementById('clear').addEventListener('click', function() {
-    document.getElementById('display').textContent = '0'
-})
+clearButton.addEventListener('click', function() {
+    document.getElementById('display').textContent = '0';
+    num1 = undefined;
+    num2 = undefined;
+    operation = undefined;
+});
 
 // Обработчики для кнопок операторов
-plus.addEventListener('click', function() {
-    num1 = document.getElementById('display')
-    document.getElementById('display').textContent = '0'
-    operation = '+'
-})
-
-minus.addEventListener('click', function() {
-    num1 = document.getElementById('display')
-    document.getElementById('display').textContent = '0'
-    operation = '-'
-})
-
-multiply.addEventListener('click', function() {
-    num1 = document.getElementById('display')
-    document.getElementById('display').textContent = '0'
-    operation = '*'
-})
-
-split.addEventListener('click', function() {
-    num1 = document.getElementById('display')
-    document.getElementById('display').textContent = '0'
-    operation = '/'
-})
+operators.forEach(operator => {
+    operator.addEventListener('click', function() {
+        num1 = document.getElementById('display').textContent;
+        operation = this.textContent === '×' ? '*' : this.textContent;
+        document.getElementById('display').textContent = '0';
+    });
+});
 
 // Обработчик для кнопки равно
 equal.addEventListener('click', function() {
-    num2 = document.getElementById('display')
-    document.getElementById('display').textContent = '0'
-    document.getElementById('display').textContent = oper(num1, num2, operation)
-})
+    if (num1 !== undefined && operation !== undefined) {
+        num2 = document.getElementById('display').textContent;
+        const result = calculate(num1, num2, operation);
+        document.getElementById('display').textContent = result;
+        num1 = result.toString();
+    }
+});
